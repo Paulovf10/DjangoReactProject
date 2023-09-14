@@ -1,4 +1,9 @@
-![img.png](static/readm/img2.png) 
+<img src="https://ccomp.ufsj.edu.br/images/logo/logo_white.png" width=50% align="left" />
+
+
+
+<br>
+
 # Sistema de Gestão de Funcionários e Metas (SGFM)
 
 ## Descrição
