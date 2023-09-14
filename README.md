@@ -1,6 +1,5 @@
+![img.png](static/readm/img2.png) 
 # Sistema de Gestão de Funcionários e Metas (SGFM)
-
-![Logo da Empresa](link-para-o-logo-aqui.png) 
 
 ## Descrição
 
