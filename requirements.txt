@@ -1,0 +1,9 @@
+Django==3.2.15
+django-cors-headers==3.13.0
+django-import-export==2.9.0
+django-tinymce4-lite==1.8.0
+djangorestframework==3.14.0
+gunicorn==20.1.0
+mysqlclient==2.1.1
+Pillow==8.4.0
+onesignal-sdk==2.0.0
