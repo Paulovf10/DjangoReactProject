@@ -1,10 +1,11 @@
 from django.contrib import admin
 
-
-"""class ContactAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'phone', 'subject', 'is_read', 'created_at')
-    list_filter = ('is_read', 'created_at',)
-    search_fields = ('name', 'email', 'subject')
+from core.models import Gestor
 
 
-admin.site.register(Contact, ContactAdmin)"""
+class GestorAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'email', 'dtNascimento', 'empresa', 'cargo', 'equipe')
+    search_fields = ('nome', 'email', 'empresa')
+
+
+admin.site.register(Gestor, GestorAdmin)
