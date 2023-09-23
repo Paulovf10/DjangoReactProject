@@ -7,6 +7,8 @@ from django.views.static import serve
 from django.urls import re_path as url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from .views import GestorCreateView, GestorUpdateView, GestorDeleteView, GestorListView
+
 admin.autodiscover()
 admin.site.site_header = u'Back office '
 admin.site.index_title = u'Administração'
@@ -17,7 +19,10 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('api/auth/', include('custom_auth.api_urls')),
-
+    path('gestor/create/', GestorCreateView.as_view(), name='gestor-create'),
+    path('gestor/update/<int:pk>/', GestorUpdateView.as_view(), name='gestor-update', ),
+    path('gestor/list/', GestorListView.as_view(), name='gestor-list'),
+    path('gestor/delete/<int:pk>/', GestorDeleteView.as_view(), name='gestor-delete'),
     path('tinymce/', include('tinymce.urls')),
 
 ]

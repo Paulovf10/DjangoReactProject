@@ -5,6 +5,15 @@
 <br>
 <br>
 <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 
 # Sistema de Gestão de Funcionários e Metas (SGFM)
@@ -31,7 +40,7 @@ O SGFM é uma plataforma digital inovadora desenhada para facilitar a administra
 
 ## Funcionalidades Principais
 
-1. Cadastro de Funcionários
+1. Cadastro de Funcionários e Gestores
 2. Cadastro de Metas
 3. Atribuição de Metas
 4. Acompanhamento de Progresso
@@ -74,6 +83,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000000
 ```
 2. **Instalando as dependências**: Atraves do comando pip install -r requirements.txt
 3. **Iniciando o servidor**: Para rodar o servidor basta utilizar o comando python manage.py runserver
+4. Recomendase que use mysql para rodar a aplicação porem pode ser integrada com outros tipo de banco de dados.
 
 ## Diagramas de Casos de Uso
 
