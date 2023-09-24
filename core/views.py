@@ -45,3 +45,8 @@ class GestorUpdateView(generics.UpdateAPIView):
     def get_serializer(self, *args, **kwargs):
         kwargs['partial'] = True
         return super().get_serializer(*args, **kwargs)
+
+
+class GestorRetrieveView(generics.RetrieveAPIView):
+    queryset = Gestor.objects.all()
+    serializer_class = GestorSerializer

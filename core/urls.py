@@ -7,7 +7,7 @@ from django.views.static import serve
 from django.urls import re_path as url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from .views import GestorCreateView, GestorUpdateView, GestorDeleteView, GestorListView
+from .views import GestorCreateView, GestorUpdateView, GestorDeleteView, GestorListView, GestorRetrieveView
 
 admin.autodiscover()
 admin.site.site_header = u'Back office '
@@ -23,6 +23,7 @@ urlpatterns = [
     path('gestor/update/<int:pk>/', GestorUpdateView.as_view(), name='gestor-update', ),
     path('gestor/list/', GestorListView.as_view(), name='gestor-list'),
     path('gestor/delete/<int:pk>/', GestorDeleteView.as_view(), name='gestor-delete'),
+    path('gestor/retrieve/<int:pk>/', GestorRetrieveView.as_view(), name='gestor-retrieve'),
     path('tinymce/', include('tinymce.urls')),
 
 ]
