@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
-from .models import UserProfile, UserAddress
+from .models import UserProfile
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -19,7 +19,7 @@ from rest_framework.status import (
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 
-from .serializers import RegistrationSerializer, UserProfileSerializer, UserAddressSerializer
+from .serializers import RegistrationSerializer, UserProfileSerializer
 
 
 # USER API
@@ -32,40 +32,6 @@ class UserAPIView(APIView):
         serializer = UserProfileSerializer(user_token.user)
 
         return Response(serializer.data)
-
-
-@api_view(["POST"])
-@permission_classes((AllowAny,))
-def registration_view(request):
-    data = {}
-    if request.method == 'POST':
-        print(request.POST)
-        print(request.data)
-        serializer = RegistrationSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            data['message'] = "Cadastro realizado com sucesso! "
-            data['identifier'] = user.identifier
-            token_obj, created = Token.objects.get_or_create(user=user)
-
-            postal_code = request.data.get("postal_code")
-            address = request.data.get("address")
-            address_number = request.data.get("address_number")
-            address_complement = request.data.get("address_complement")
-            address_neighborhood = request.data.get("address_neighborhood")
-            city = request.data.get("city")
-            state = request.data.get("state")
-            UserAddress.objects.create(user=user, postal_code=postal_code, address=address, is_principal=True,
-                                       address_number=address_number, address_complement=address_complement,
-                                       address_neighborhood=address_neighborhood, city=city, state=state)
-
-            token = token_obj.key
-            data['token'] = token
-        else:
-            data = serializer.errors
-
-    print(data)
-    return Response(data)
 
 
 @csrf_exempt
@@ -131,59 +97,4 @@ def change_user_password(request):
                         status=HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
-@permission_classes((AllowAny,))
-def save_address(request):
-    user_token = request.data.get("token")
 
-    token_obj = get_object_or_404(Token, key=user_token)
-    user = token_obj.user
-
-    name = request.data.get("name", "")
-    postal_code = request.data.get("postal_code", "").replace("-", "").replace(".", "")
-    address = request.data.get("address", "")
-    address_neighborhood = request.data.get("address_neighborhood", "")
-    address_number = request.data.get("address_number", "")
-    address_complement = request.data.get("address_complement", "")
-    city = request.data.get("city", "")
-    state = request.data.get("state", "")
-
-    user_address, created = UserAddress.objects.get_or_create(user=user, name=name, postal_code=postal_code,
-                                                              address=address, is_principal=True,
-                                                              address_neighborhood=address_neighborhood,
-                                                              address_number=address_number,
-                                                              address_complement=address_complement, city=city,
-                                                              state=state)
-    if created:
-        return Response({}, status=HTTP_200_OK)
-    else:
-        return Response({'error': 'Registro duplicado.'}, status=HTTP_400_BAD_REQUEST)
-
-
-@api_view(["POST"])
-def set_principal_address(request):
-    user = request.user
-
-    address_id = request.data.get("address_id", "")
-    address = get_object_or_404(UserAddress, pk=address_id)
-
-    if address.user == user:
-        UserAddress.objects.filter(user=user).update(is_principal=False)
-
-        address.is_principal = True
-        address.save()
-
-        return Response({}, status=HTTP_200_OK)
-
-    else:
-        return Response({'error': 'Operação inválida.'}, status=HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET"])
-def get_principal_address(request):
-    user = request.user
-
-    address = UserAddress.objects.filter(is_principal=True, user=user).first()
-    address_serializer = UserAddressSerializer(address)
-
-    return Response(address_serializer.data, status=HTTP_200_OK)

@@ -1,18 +1,9 @@
 from rest_framework import serializers
-from .models import UserProfile, UserAddress
+from .models import UserProfile
 from django.db import transaction
 
 
-class UserAddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserAddress
-        fields = (
-            'user', 'name', 'postal_code', 'address', 'address_neighborhood', 'address_number', 'address_complement',
-            'city', 'state', 'is_principal', 'id',)
-
-
 class UserProfileSerializer(serializers.ModelSerializer):
-    user_address = UserAddressSerializer(many=True, read_only=True)
 
     class Meta:
         model = UserProfile

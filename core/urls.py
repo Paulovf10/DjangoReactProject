@@ -7,7 +7,9 @@ from django.views.static import serve
 from django.urls import re_path as url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from .views import GestorCreateView, GestorUpdateView, GestorDeleteView, GestorListView, GestorRetrieveView
+from .views import UserProfileCreateView, UserProfileUpdateView, UserProfileDeleteView, UserProfileListView, \
+    UserProfileRetrieveView, EquipeCreateView, EquipeListView, EquipeUpdateView, EquipeDeleteView, EquipeRetrieveView, \
+    MetaCreateView, MetaUpdateView, MetaListView, MetaDeleteView, MetaRetrieveView
 
 admin.autodiscover()
 admin.site.site_header = u'Back office '
@@ -19,11 +21,24 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('api/auth/', include('custom_auth.api_urls')),
-    path('gestor/create/', GestorCreateView.as_view(), name='gestor-create'),
-    path('gestor/update/<int:pk>/', GestorUpdateView.as_view(), name='gestor-update', ),
-    path('gestor/list/', GestorListView.as_view(), name='gestor-list'),
-    path('gestor/delete/<int:pk>/', GestorDeleteView.as_view(), name='gestor-delete'),
-    path('gestor/retrieve/<int:pk>/', GestorRetrieveView.as_view(), name='gestor-retrieve'),
+    path('user/create/', UserProfileCreateView.as_view(), name='gestor-create'),
+    path('user/update/<int:pk>/', UserProfileUpdateView.as_view(), name='gestor-update', ),
+    path('user/list/', UserProfileListView.as_view(), name='gestor-list'),
+    path('user/delete/<int:pk>/', UserProfileDeleteView.as_view(), name='gestor-delete'),
+    path('user/retrieve/<int:pk>/', UserProfileRetrieveView.as_view(), name='gestor-retrieve'),
+
+    path('equipe/create/', EquipeCreateView.as_view(), name='equipe-create'),
+    path('equipe/update/<int:pk>/', EquipeUpdateView.as_view(), name='equipe-update', ),
+    path('equipe/list/', EquipeListView.as_view(), name='equipe-list'),
+    path('equipe/delete/<int:pk>/', EquipeDeleteView.as_view(), name='equipe-delete'),
+    path('equipe/retrieve/<int:pk>/', EquipeRetrieveView.as_view(), name='equipe-retrieve'),
+
+    path('meta/create/', MetaCreateView.as_view(), name='meta-create'),
+    path('meta/update/<int:pk>/', MetaUpdateView.as_view(), name='meta-update', ),
+    path('meta/list/', MetaListView.as_view(), name='meta-list'),
+    path('meta/delete/<int:pk>/', MetaDeleteView.as_view(), name='meta-delete'),
+    path('meta/retrieve/<int:pk>/', MetaRetrieveView.as_view(), name='meta-retrieve'),
+
     path('tinymce/', include('tinymce.urls')),
 
 ]
