@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
+
 from custom_auth.models import UserProfile
 from .models import Equipe, Meta
 from .serializers import UserSerializer, UserUpdateSerializer, EquipeSerializer, EquipeUpdateSerializer, MetaSerializer, \
@@ -15,9 +17,18 @@ class UserProfileCreateView(generics.CreateAPIView):
     """
         API para criação de UserProfile
     """
+
     queryset = UserProfile.objects.all()
     serializer_class = UserSerializer
 
+    def create(self, request, *args, **kwargs):
+        try:
+            response = super(UserProfileCreateView, self).create(request, *args, **kwargs)
+            return response
+        except Exception as e:
+            print(request.data)
+            print(f"Erro ao criar UserProfile: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserProfileDeleteView(generics.DestroyAPIView):
     """
