@@ -10,7 +10,7 @@ class Meta(models.Model):
         Classe referente ao modelo de Gestores.
     """
     nome = models.CharField(max_length=50, blank=False, null=True, verbose_name='Nome')
-    descircao = models.TextField(blank=False, null=False, verbose_name='Descrição')
+    descricao = models.TextField(blank=False, null=False, verbose_name='Descrição')
     tipo_meta = models.SmallIntegerField(verbose_name='Tipo de meta', null=True, blank=True, choices=TIPO_META)
     gestor = models.ForeignKey(
         UserProfile,

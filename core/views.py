@@ -109,10 +109,17 @@ class EquipeRetrieveView(generics.RetrieveAPIView):
 
 class MetaCreateView(generics.CreateAPIView):
     """
-        API para criação de Meta.
+    API para criação de Meta.
     """
     queryset = Meta.objects.all()
     serializer_class = MetaSerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        return super(MetaCreateView, self).create(request, *args, **kwargs)
+    def get_serializer(self, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().get_serializer(*args, **kwargs)
 
 
 class MetaDeleteView(generics.DestroyAPIView):
@@ -133,10 +140,15 @@ class MetaListView(generics.ListAPIView):
 
 class MetaUpdateView(generics.UpdateAPIView):
     """
-        API para atualizar uma Meta.
+    API para atualizar uma Meta.
     """
     queryset = Meta.objects.all()
     serializer_class = MetaUpdateSerializer
+
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        return super(MetaUpdateView, self).update(request, *args, **kwargs)
+
 
     def get_serializer(self, *args, **kwargs):
         kwargs['partial'] = True

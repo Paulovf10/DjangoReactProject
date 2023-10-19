@@ -52,7 +52,7 @@ class UserProfile(AbstractBaseUser):
     is_staff = models.BooleanField(default=False, verbose_name='Staff')
 
     cpf = models.CharField(max_length=30, verbose_name='CPF', null=True, blank=True, )
-    addres = models.CharField(max_length=30, verbose_name='Endereço', null=True, blank=True, )
+    addres = models.CharField(max_length=100, verbose_name='Endereço', null=True, blank=True, )
     type_user = models.SmallIntegerField(verbose_name='Tipo de usuário', null=True, blank=True, choices=TIPO_USUARIO)
     profile_picture = models.FileField(verbose_name="Foto de perfil", null=True, blank=True, upload_to="perfil")
 
