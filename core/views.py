@@ -70,6 +70,10 @@ class EquipeCreateView(generics.CreateAPIView):
     queryset = Equipe.objects.all()
     serializer_class = EquipeSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        return super(EquipeCreateView, self).create(request, *args, **kwargs)
+
 
 class EquipeDeleteView(generics.DestroyAPIView):
     """

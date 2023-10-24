@@ -10,6 +10,6 @@ TIPO_USUARIO = (
 
 TIPO_META = (
     (EnumTipoMeta.COLABORADOR.value, u'Colaborador'),
-    (EnumTipoMeta.EQUIPE, u'Equipe'),
+    (EnumTipoMeta.EQUIPE.value, u'Equipe'),
 
 )
