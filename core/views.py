@@ -3,9 +3,9 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from custom_auth.models import UserProfile
-from .models import Equipe, Meta
+from .models import Equipe, Meta, AtualizarMeta
 from .serializers import UserSerializer, UserUpdateSerializer, EquipeSerializer, EquipeUpdateSerializer, MetaSerializer, \
-    MetaUpdateSerializer
+    MetaUpdateSerializer, AtualizarMetaSerializer
 
 
 def index(request):
@@ -165,3 +165,27 @@ class MetaRetrieveView(generics.RetrieveAPIView):
     """
     queryset = Meta.objects.all()
     serializer_class = MetaSerializer
+
+
+
+class AtualizacoesMetaListView(generics.ListAPIView):
+    serializer_class = AtualizarMetaSerializer
+
+    def get_queryset(self):
+        """
+        Este view deverá retornar uma lista de todas as atualizações
+        para a meta conforme o id da meta passado na URL.
+        """
+        meta_id = self.kwargs['meta_id']
+        return AtualizarMeta.objects.filter(meta_id=meta_id)
+
+
+
+class AtualizarMetaCreateView(generics.CreateAPIView):
+    queryset = AtualizarMeta.objects.all()
+    serializer_class = AtualizarMetaSerializer
+
+    def perform_create(self, serializer):
+        meta = Meta.objects.get(pk=self.kwargs['meta_id'])
+        serializer.save(meta=meta)
+        meta.update_progress(serializer.validated_data['valorAtualizacao'])

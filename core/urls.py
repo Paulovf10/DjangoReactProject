@@ -9,7 +9,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from .views import UserProfileCreateView, UserProfileUpdateView, UserProfileDeleteView, UserProfileListView, \
     UserProfileRetrieveView, EquipeCreateView, EquipeListView, EquipeUpdateView, EquipeDeleteView, EquipeRetrieveView, \
-    MetaCreateView, MetaUpdateView, MetaListView, MetaDeleteView, MetaRetrieveView
+    MetaCreateView, MetaUpdateView, MetaListView, MetaDeleteView, MetaRetrieveView, AtualizacoesMetaListView, \
+    AtualizarMetaCreateView
 
 admin.autodiscover()
 admin.site.site_header = u'Back office '
@@ -38,6 +39,9 @@ urlpatterns = [
     path('meta/list/', MetaListView.as_view(), name='meta-list'),
     path('meta/delete/<int:pk>/', MetaDeleteView.as_view(), name='meta-delete'),
     path('meta/retrieve/<int:pk>/', MetaRetrieveView.as_view(), name='meta-retrieve'),
+
+    path('meta/<int:meta_id>/atualizacoes/', AtualizacoesMetaListView.as_view(), name='atualizacoes-meta-list'),
+    path('meta/<int:meta_id>/atualizar/', AtualizarMetaCreateView.as_view(), name='atualizar-meta-create'),
 
     path('tinymce/', include('tinymce.urls')),
 

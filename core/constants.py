@@ -10,3 +10,12 @@ class EnumTipoUsuario(Enum):
 class EnumTipoMeta(Enum):
     COLABORADOR = 1
     EQUIPE = 2
+
+
+class EnumUnidadeMedida(Enum):
+    UNIDADES = 1
+    REAIS = 2
+    PORCENTAGEM = 3
+    HORAS = 4
+    DIAS = 5
+    PROJETOS = 6
