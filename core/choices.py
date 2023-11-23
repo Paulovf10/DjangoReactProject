@@ -1,4 +1,4 @@
-from core.constants import EnumTipoUsuario, EnumTipoMeta, EnumUnidadeMedida
+from core.constants import EnumTipoUsuario, EnumTipoMeta, EnumUnidadeMedida, EnumTipoNota
 
 TIPO_USUARIO = (
     (EnumTipoUsuario.ADMINISTRADOR.value, u'Administrador'),
@@ -21,4 +21,13 @@ UNIDADE_MEDIDA_CHOICES = (
     (EnumUnidadeMedida.HORAS.value, 'Horas'),
     (EnumUnidadeMedida.DIAS.value, 'Dias'),
     (EnumUnidadeMedida.PROJETOS.value, 'Projetos'),
+)
+
+TIPO_NOTA = (
+    (EnumTipoNota.S.value, 'S'),
+    (EnumTipoNota.A.value, 'A'),
+    (EnumTipoNota.B.value, 'B'),
+    (EnumTipoNota.C.value, 'C'),
+    (EnumTipoNota.D.value, 'D'),
+    (EnumTipoNota.F.value, 'E'),
 )

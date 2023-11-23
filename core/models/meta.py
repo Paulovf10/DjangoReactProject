@@ -52,7 +52,6 @@ class Meta(models.Model):
         return 0
 
     def update_progress(self, valor):
-        print(1)
         self.progressoAtual = float(self.progressoAtual) + float(valor)
         if self.progressoAtual >= float(self.valorAlvo):
             self.metaBatida = True

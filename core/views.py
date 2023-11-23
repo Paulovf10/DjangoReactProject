@@ -1,11 +1,12 @@
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.response import Response
 
 from custom_auth.models import UserProfile
-from .models import Equipe, Meta, AtualizarMeta
+from .models import Equipe, Meta, AtualizarMeta, Relatorio
 from .serializers import UserSerializer, UserUpdateSerializer, EquipeSerializer, EquipeUpdateSerializer, MetaSerializer, \
-    MetaUpdateSerializer, AtualizarMetaSerializer
+    MetaUpdateSerializer, AtualizarMetaSerializer, RelatorioSerializer, RMetaSerializer
 
 
 def index(request):
@@ -29,6 +30,7 @@ class UserProfileCreateView(generics.CreateAPIView):
             print(request.data)
             print(f"Erro ao criar UserProfile: {e}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserProfileDeleteView(generics.DestroyAPIView):
     """
@@ -121,6 +123,7 @@ class MetaCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         print(request.data)
         return super(MetaCreateView, self).create(request, *args, **kwargs)
+
     def get_serializer(self, *args, **kwargs):
         kwargs['partial'] = True
         return super().get_serializer(*args, **kwargs)
@@ -153,7 +156,6 @@ class MetaUpdateView(generics.UpdateAPIView):
         print(request.data)
         return super(MetaUpdateView, self).update(request, *args, **kwargs)
 
-
     def get_serializer(self, *args, **kwargs):
         kwargs['partial'] = True
         return super().get_serializer(*args, **kwargs)
@@ -165,7 +167,6 @@ class MetaRetrieveView(generics.RetrieveAPIView):
     """
     queryset = Meta.objects.all()
     serializer_class = MetaSerializer
-
 
 
 class AtualizacoesMetaListView(generics.ListAPIView):
@@ -180,7 +181,6 @@ class AtualizacoesMetaListView(generics.ListAPIView):
         return AtualizarMeta.objects.filter(meta_id=meta_id)
 
 
-
 class AtualizarMetaCreateView(generics.CreateAPIView):
     queryset = AtualizarMeta.objects.all()
     serializer_class = AtualizarMetaSerializer
@@ -189,3 +189,78 @@ class AtualizarMetaCreateView(generics.CreateAPIView):
         meta = Meta.objects.get(pk=self.kwargs['meta_id'])
         serializer.save(meta=meta)
         meta.update_progress(serializer.validated_data['valorAtualizacao'])
+
+
+class RelatorioAPIView(generics.CreateAPIView):
+    def post(self, request, *args, **kwargs):
+        relatorio_serializer = RelatorioSerializer(data=request.data)
+        relatorio_serializer.is_valid(raise_exception=True)
+
+        tipo = relatorio_serializer.validated_data['tipo']
+        id = relatorio_serializer.validated_data['id']
+
+        if tipo == 'colaborador':
+            entity = UserProfile.objects.filter(type_user=3, id=id).first()
+            if not entity:
+                return Response({'error': 'Colaborador não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            metas = Meta.objects.filter(colaboradores=entity)
+        elif tipo == 'equipe':
+            entity = Equipe.objects.filter(id=id).first()
+            if not entity:
+                return Response({'error': 'Equipe não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+            metas = Meta.objects.filter(equipe=entity)
+        else:
+            return Response({'error': 'Tipo inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Calculando os scores
+        hoje = timezone.now().date()
+        quantidade = metas.count()
+        finalizadas = metas.filter(metaBatida=True).count()
+        emAberto = metas.filter( dataFim__gte=hoje, metaBatida=False).count()
+        naoFinalizadas = metas.filter(dataFim__lt=hoje, metaBatida=False).count()
+        taxaSucesso = finalizadas / quantidade * 100 if quantidade else 0
+        for meta in metas:
+            print(meta.dataFim)
+            print(hoje)
+            print('-----')
+        # Atribuindo uma nota baseada na taxa de sucesso (exemplo simplificado)
+        if taxaSucesso >= 90:
+            notaFinal = ('S',1 )
+        elif taxaSucesso >= 80:
+            notaFinal = ('A', 2)
+        elif taxaSucesso >= 70:
+            notaFinal = ('B', 3)
+        elif taxaSucesso >= 60:
+            notaFinal = ('C', 4)
+        elif taxaSucesso >= 50:
+            notaFinal = ('D',5)
+        else:
+            notaFinal = ('F', 6)
+
+        # Criando o relatório
+        relatorio = Relatorio.objects.create(
+            tipoRelatorio=1 if tipo == 'colaborador' else 2,
+            colaborador=entity if tipo == 'colaborador' else None,
+            equipe=entity if tipo == 'equipe' else None,
+            quantidade=quantidade,
+            finalizadas=finalizadas,
+            emAberto=emAberto,
+            naoFinalizadas=naoFinalizadas,
+            taxaSucesso=taxaSucesso,
+            notaFinal=notaFinal[1]
+        )
+
+        # Serializando o relatório
+        metas_serializer = RMetaSerializer(metas, many=True)
+        relatorio_data = {
+            'tipo': tipo,
+            'id': id,
+            'quantidade': quantidade,
+            'finalizadas': finalizadas,
+            'emAberto': emAberto,
+            'naoFinalizadas': naoFinalizadas,
+            'taxaSucesso': taxaSucesso,
+            'notaFinal': notaFinal[0],
+            'metas': metas_serializer.data
+        }
+        return Response(relatorio_data)

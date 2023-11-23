@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from core.models import Equipe, Meta, AtualizarMeta
+from core.models import Equipe, Meta, AtualizarMeta, Relatorio
 from custom_auth.models import UserProfile
 from django.contrib.auth.models import Group
 
@@ -22,6 +22,12 @@ class AtualizarMetaAdmin(admin.ModelAdmin):
     search_fields = ('meta',)
 
 
+class RelatoriosAdmin(admin.ModelAdmin):
+    list_display = ('notaFinal', 'colaborador', 'equipe')
+    search_fields = ('meta',)
+
+
+admin.site.register(Relatorio, RelatoriosAdmin)
 admin.site.unregister(Group)
 admin.site.register(UserProfile)
 admin.site.register(Equipe, EquipeAdmin)

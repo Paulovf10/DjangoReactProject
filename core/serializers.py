@@ -1,6 +1,6 @@
 from custom_auth.models import UserProfile
 from rest_framework import serializers
-from .models import Equipe, Meta, AtualizarMeta
+from .models import Equipe, Meta, AtualizarMeta, Relatorio
 
 """
     Transforma o json em objetos python, foi utilizada funções genericas na criação.
@@ -61,3 +61,21 @@ class MetaUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meta
         fields = '__all__'
+
+
+class RAtualizarMetaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AtualizarMeta
+        fields = ['comentario', 'valorAtualizacao', 'criadoEm']
+
+class RMetaSerializer(serializers.ModelSerializer):
+    atualizacoes = RAtualizarMetaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Meta
+        fields = ['nome', 'descricao', 'tipoMeta', 'valorAlvo', 'progressoAtual',
+                  'unidadeMedida', 'dataInicio', 'dataFim', 'metaBatida', 'ativo', 'atualizacoes']
+class RelatorioSerializer(serializers.Serializer):
+    tipo = serializers.ChoiceField(choices=['colaborador', 'equipe'])
+    id = serializers.IntegerField()
+    metas = RMetaSerializer(many=True, read_only=True)
