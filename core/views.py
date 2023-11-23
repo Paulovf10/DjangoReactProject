@@ -4,9 +4,10 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from custom_auth.models import UserProfile
+from .constants import EnumTipoUsuario
 from .models import Equipe, Meta, AtualizarMeta, Relatorio
 from .serializers import UserSerializer, UserUpdateSerializer, EquipeSerializer, EquipeUpdateSerializer, MetaSerializer, \
-    MetaUpdateSerializer, AtualizarMetaSerializer, RelatorioSerializer, RMetaSerializer
+    MetaUpdateSerializer, AtualizarMetaSerializer, RelatorioSerializer, RMetaSerializer, LoginSerializer
 
 
 def index(request):
@@ -216,7 +217,7 @@ class RelatorioAPIView(generics.CreateAPIView):
         hoje = timezone.now().date()
         quantidade = metas.count()
         finalizadas = metas.filter(metaBatida=True).count()
-        emAberto = metas.filter( dataFim__gte=hoje, metaBatida=False).count()
+        emAberto = metas.filter(dataFim__gte=hoje, metaBatida=False).count()
         naoFinalizadas = metas.filter(dataFim__lt=hoje, metaBatida=False).count()
         taxaSucesso = finalizadas / quantidade * 100 if quantidade else 0
         for meta in metas:
@@ -225,7 +226,7 @@ class RelatorioAPIView(generics.CreateAPIView):
             print('-----')
         # Atribuindo uma nota baseada na taxa de sucesso (exemplo simplificado)
         if taxaSucesso >= 90:
-            notaFinal = ('S',1 )
+            notaFinal = ('S', 1)
         elif taxaSucesso >= 80:
             notaFinal = ('A', 2)
         elif taxaSucesso >= 70:
@@ -233,7 +234,7 @@ class RelatorioAPIView(generics.CreateAPIView):
         elif taxaSucesso >= 60:
             notaFinal = ('C', 4)
         elif taxaSucesso >= 50:
-            notaFinal = ('D',5)
+            notaFinal = ('D', 5)
         else:
             notaFinal = ('F', 6)
 
@@ -264,3 +265,15 @@ class RelatorioAPIView(generics.CreateAPIView):
             'metas': metas_serializer.data
         }
         return Response(relatorio_data)
+
+
+class LoginApiView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        queryset = UserProfile.objects.filter().exclude(type_user=EnumTipoUsuario.ADMINISTRADOR.value)
+        try:
+            queryset.get(email=request.data['email'], password=request.data['senha'])
+            return Response({'message': 'Login Successful'})
+        except Exception as e:
+            return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)

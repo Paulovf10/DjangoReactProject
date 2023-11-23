@@ -68,6 +68,7 @@ class RAtualizarMetaSerializer(serializers.ModelSerializer):
         model = AtualizarMeta
         fields = ['comentario', 'valorAtualizacao', 'criadoEm']
 
+
 class RMetaSerializer(serializers.ModelSerializer):
     atualizacoes = RAtualizarMetaSerializer(many=True, read_only=True)
 
@@ -75,7 +76,15 @@ class RMetaSerializer(serializers.ModelSerializer):
         model = Meta
         fields = ['nome', 'descricao', 'tipoMeta', 'valorAlvo', 'progressoAtual',
                   'unidadeMedida', 'dataInicio', 'dataFim', 'metaBatida', 'ativo', 'atualizacoes']
+
+
 class RelatorioSerializer(serializers.Serializer):
     tipo = serializers.ChoiceField(choices=['colaborador', 'equipe'])
     id = serializers.IntegerField()
     metas = RMetaSerializer(many=True, read_only=True)
+
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
