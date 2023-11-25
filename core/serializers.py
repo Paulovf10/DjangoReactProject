@@ -83,6 +83,10 @@ class RelatorioSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     metas = RMetaSerializer(many=True, read_only=True)
 
+class RelatorioSerializerV(serializers.ModelSerializer):
+    class Meta:
+        model = Relatorio
+        fields = '__all__'
 
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:

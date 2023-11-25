@@ -7,7 +7,8 @@ from custom_auth.models import UserProfile
 from .constants import EnumTipoUsuario
 from .models import Equipe, Meta, AtualizarMeta, Relatorio
 from .serializers import UserSerializer, UserUpdateSerializer, EquipeSerializer, EquipeUpdateSerializer, MetaSerializer, \
-    MetaUpdateSerializer, AtualizarMetaSerializer, RelatorioSerializer, RMetaSerializer, LoginSerializer
+    MetaUpdateSerializer, AtualizarMetaSerializer, RelatorioSerializer, RMetaSerializer, LoginSerializer, \
+    RelatorioSerializerV
 
 
 def index(request):
@@ -220,10 +221,7 @@ class RelatorioAPIView(generics.CreateAPIView):
         emAberto = metas.filter(dataFim__gte=hoje, metaBatida=False).count()
         naoFinalizadas = metas.filter(dataFim__lt=hoje, metaBatida=False).count()
         taxaSucesso = finalizadas / quantidade * 100 if quantidade else 0
-        for meta in metas:
-            print(meta.dataFim)
-            print(hoje)
-            print('-----')
+
         # Atribuindo uma nota baseada na taxa de sucesso (exemplo simplificado)
         if taxaSucesso >= 90:
             notaFinal = ('S', 1)
@@ -267,13 +265,78 @@ class RelatorioAPIView(generics.CreateAPIView):
         return Response(relatorio_data)
 
 
+class RelatorioListView(generics.ListAPIView):
+    queryset = Relatorio.objects.all()
+    serializer_class = RelatorioSerializerV
+
+
+class RelatorioDetailView(generics.RetrieveAPIView):
+    queryset = Relatorio.objects.all()
+    serializer_class = RelatorioSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        relatorio = self.get_object()
+
+        # Suponha que 'metas' é um campo de relacionamento reverso de Relatorio para Meta
+
+        tipo = relatorio.tipoRelatorio
+        id = relatorio
+        print(tipo)
+        if tipo == 1:
+            id = relatorio.colaborador.id
+            entity = UserProfile.objects.filter(type_user=3, id=id).first()
+            metas = Meta.objects.filter(colaboradores=entity)
+        elif tipo == 2:
+            id = relatorio.equipe.id
+            entity = Equipe.objects.filter(id=id).first()
+            metas = Meta.objects.filter(equipe=entity)
+
+        hoje = timezone.now().date()
+        quantidade = metas.count()
+        finalizadas = metas.filter(metaBatida=True).count()
+        emAberto = metas.filter(dataFim__gte=hoje, metaBatida=False).count()
+        naoFinalizadas = metas.filter(dataFim__lt=hoje, metaBatida=False).count()
+        taxaSucesso = finalizadas / quantidade * 100 if quantidade else 0
+
+        notaFinal = ('S' if taxaSucesso >= 90 else
+                     'A' if taxaSucesso >= 80 else
+                     'B' if taxaSucesso >= 70 else
+                     'C' if taxaSucesso >= 60 else
+                     'D' if taxaSucesso >= 50 else
+                     'F')
+
+        metas_serializer = RMetaSerializer(metas, many=True)
+        relatorio_data = {
+            'tipo': 'colaborador' if relatorio.colaborador else 'equipe',
+            'id': relatorio.id,
+            'quantidade': quantidade,
+            'finalizadas': finalizadas,
+            'emAberto': emAberto,
+            'naoFinalizadas': naoFinalizadas,
+            'taxaSucesso': taxaSucesso,
+            'notaFinal': notaFinal,
+            'metas': metas_serializer.data
+        }
+        print(relatorio_data)
+        return Response(relatorio_data)
+
+
+class RelatorioDeleteView(generics.DestroyAPIView):
+    """
+        API para deletar relatorio
+    """
+    queryset = Relatorio.objects.all()
+    serializer_class = RelatorioSerializerV
+
+
 class LoginApiView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
         queryset = UserProfile.objects.filter().exclude(type_user=EnumTipoUsuario.ADMINISTRADOR.value)
         try:
-            queryset.get(email=request.data['email'], password=request.data['senha'])
-            return Response({'message': 'Login Successful'})
+            user = queryset.get(email=request.data['email'], password=request.data['senha'])
+            return Response({'message': 'Login Successful', "tipo": f"{user.type_user}", "name": user.name},
+                            status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
